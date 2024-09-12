@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória de Flores</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f7eeee;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+        }
+
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #ec1191;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(104, 4, 4, 0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card.flipped {
+            background-color: #f80808;
+            cursor: default;
+            background-image: none;
+        }
+
+        .card.matched {
+            background-color: #09f309;
+            cursor: default;
+        }
+
+        .card.hidden {
+            background-image: url('https://akamai.sscdn.co/letras/215x215/fotos/6/a/2/2/6a2208fcd87857af39d6c8c68d98068f.jpg'); /* Imagem de fundo para cartas viradas para baixo */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Jogo da Memória</h1>
+    <div class="game-board" id="game-board"></div>
+    <script>
+
+        
+
+        const board = document.getElementById('game-board');
+        const numCards = 16;
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        // Função para criar o tabuleiro
+        function createBoard() {
+            // Cria uma lista de valores duplicados para as cartas
+            const numPairs = numCards / 2;
+            const cardValues = Array(numPairs).fill(null).flatMap((_, i) => [i, i]);
+            cardValues.sort(() => Math.random() - 0.5); // Embaralha os valores
+
+            cardValues.forEach(value => {
+                const card = document.createElement('div');
+                card.classList.add('card', 'hidden');
+                card.dataset.value = value;
+                card.style.backgroundImage = `url('https://akamai.sscdn.co/letras/215x215/fotos/d/c/d/e/dcdeb1ba14b92622cdb57983249f94a4.jpg')`; // Define a imagem de fundo da carta
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        // Função para virar uma carta
+        function flipCard() {
+            if (flippedCards.length === 2 || this.classList.contains('flipped')) return;
+
+            this.classList.add('flipped');
+            this.classList.remove('hidden');
+            flippedCards.push(this);
+
+            if (flippedCards.length === 2) {
+                setTimeout(checkForMatch, 500);
+            }
+        }
+
+        // Função para verificar se as cartas viradas são um par
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            if (card1.dataset.value === card2.dataset.value) {
+                card1.classList.add('matched');
+                card2.classList.add('matched');
+                matchedPairs++;
+                if (matchedPairs === numCards / 2) {
+                    setTimeout(() => alert('Parabéns você ganhou!'), 100);
+                }
+            } else {
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                card1.classList.add('hidden');
+                card2.classList.add('hidden');
+            }
+            flippedCards = [];
+        }
+
+        createBoard();
+    </script>
+</body>
+</html>
