@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória Luan Santana  </title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #d395c4;
+        }
+        
+        #game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: #e21176;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            position: relative;
+        }
+        
+        .card img {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        
+        .card.flipped img {
+            display: block;
+        }
+        
+        .card.matched {
+            background-color: #0ed90e;
+            cursor: default;
+        }
+        
+        .card:after {
+            content: '';
+            display: block;
+            padding-bottom: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Jogo da Memória Luan Santana </h1>
+    <div id="game-board"></div>
+    <script>
+        class MemoryGame {
+            constructor(images) {
+                this.images = images;
+                this.cards = [];
+                this.firstCard = null;
+                this.secondCard = null;
+                this.matchedPairs = 0;
+                this.createBoard();
+            }
+        
+            createBoard() {
+                const board = document.getElementById('game-board');
+                this.cards = this.images.concat(this.images).sort(() => 0.5 - Math.random());
+        
+                this.cards.forEach((image, index) => {
+                    const cardElement = document.createElement('div');
+                    cardElement.classList.add('card');
+                    cardElement.dataset.image = image;
+        
+                    const imgElement = document.createElement('img');
+                    imgElement.src = image;
+                    cardElement.appendChild(imgElement);
+        
+                    cardElement.addEventListener('click', () => this.flipCard(cardElement));
+        
+                    board.appendChild(cardElement);
+                });
+            }
+        
+            flipCard(card) {
+                if (card.classList.contains('flipped') || this.secondCard) return;
+        
+                card.classList.add('flipped');
+                card.querySelector('img').style.display = 'block';
+        
+                if (!this.firstCard) {
+                    this.firstCard = card;
+                } else {
+                    this.secondCard = card;
+                    this.checkForMatch();
+                }
+            }
+        
+            checkForMatch() {
+                if (this.firstCard.dataset.image === this.secondCard.dataset.image) {
+                    this.firstCard.classList.add('matched');
+                    this.secondCard.classList.add('matched');
+                    this.matchedPairs++;
+                    this.resetCards();
+                } else {
+                    setTimeout(() => {
+                        this.firstCard.classList.remove('flipped');
+                        this.secondCard.classList.remove('flipped');
+                        this.firstCard.querySelector('img').style.display = 'none';
+                        this.secondCard.querySelector('img').style.display = 'none';
+                        this.resetCards();
+                    }, 1000);
+                }
+            }
+        
+            resetCards() {
+                this.firstCard = null;
+                this.secondCard = null;
+        
+                if (this.matchedPairs === this.images.length) {
+                    setTimeout(() => alert('Parabéns você acertou tudo!'), 500);
+                }
+            }
+        }
+        
+        // Adapte os caminhos das imagens conforme sua pasta
+        const images = [
+            'https://tse3.mm.bing.net/th?id=OIP.LkSxdV0GGaCMHzwccfZBIQHaHa&pid=Api&P=0&h=180', 'https://salvadorentretenimento.com.br/wp-content/uploads/2023/09/Luan-Santana-Salvador-Entretenimento-CAPA.png', 'https://tse1.mm.bing.net/th?id=OIP.OiBnPIoaP65lJ8755LKOmQHaFB&pid=Api&P=0&h=180',
+            'https://tse3.mm.bing.net/th?id=OIP.m5piZGcN-2T6krI4d9_ROQHaJQ&pid=Api&P=0&h=180', 'https://tse3.mm.bing.net/th?id=OIP.do0FidG9sxRd5-4pONBdEAHaE8&pid=Api&P=0&h=180', 'https://tse1.mm.bing.net/th?id=OIP._HcsNipgUyUs-gVYQI1BOQHaEc&pid=Api&P=0&h=180',
+            'https://tse3.mm.bing.net/th?id=OIP.0G5sBJt1eTrWUAdjS0AEMwHaEK&pid=Api&P=0&h=180', 'https://tse2.mm.bing.net/th?id=OIP.pCCcCSWM9Nz-j-XamnB-MQHaGJ&pid=Api&P=0&h=180'
+        ];
+        
+        document.addEventListener('DOMContentLoaded', () => new MemoryGame(images));
+    </script>
+</body>
+</html>
